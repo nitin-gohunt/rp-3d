@@ -41,7 +41,7 @@ def Tag() {
 
 def TerraformScriptToRun() {
     if (env.GIT_BRANCH =~ 'release' || env.GIT_BRANCH == 'experimental' || env.GIT_BRANCH == 'staging') {
-        env.TF_COMMAND = "plan"
+        env.TF_COMMAND = "apply"
     }
     else
         env.TF_COMMAND = "plan"
