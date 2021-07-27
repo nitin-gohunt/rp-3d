@@ -187,6 +187,23 @@ pipeline {
                       }
                   }
             }
+            stage('Tag Git')
+                when {
+                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'release' }
+                }
+                agent { label 'master' }
+                  steps {
+                      ansiColor('xterm') {
+                          sh script: './terraform-modules/scripts/docker.sh $(pwd)'
+                          sh """
+                              REPO=\$(echo \${GIT_URL} | awk -F '/' '{print \$5 }')
+                              git remote set-url origin git@bitbucket.org:gohuntcom/\$REPO
+                              git tag --force \${IMAGE_TAG}
+                              git push origin \${IMAGE_TAG}
+                          """
+                      }
+                  }
+            }
             stage('Terraform Deploy') {
                 when {
                     expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'release' || GIT_BRANCH =~ 'feature' }
