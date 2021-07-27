@@ -23,4 +23,5 @@ module "fargate" {
   # Service parameters
   health_check_path = "/"
   image_tag         = var.image_tag
+  variable_file     = "auth.localenv"
 }
