@@ -187,7 +187,7 @@ pipeline {
                       }
                   }
             }
-            stage('Tag Git')
+            stage('Tag Git') {
                 when {
                     expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'release' }
                 }
