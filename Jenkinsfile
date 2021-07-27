@@ -63,7 +63,7 @@ pipeline {
                         properties([disableConcurrentBuilds(),
                                     buildDiscarder(logRotator(daysToKeepStr: '10'))])
                     }
-                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/main"]],
+                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/test"]],
                     userRemoteConfigs: [[credentialsId: '8a03683d-1f49-4493-84ee-a3f6f0fd76f1', url: 'git@bitbucket.org:gohuntcom/terraform-modules.git']],
                     extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'terraform-modules']]
                     ])
@@ -83,7 +83,7 @@ pipeline {
                     userRemoteConfigs: [[credentialsId: '8a03683d-1f49-4493-84ee-a3f6f0fd76f1', url: 'git@bitbucket.org:gohuntcom/aws-deployment-configurations.git']],
                     extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'manifest']]
                     ])
-                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/main"]],
+                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/test"]],
                     userRemoteConfigs: [[credentialsId: '8a03683d-1f49-4493-84ee-a3f6f0fd76f1', url: 'git@bitbucket.org:gohuntcom/terraform-modules.git']],
                     extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'terraform-modules']]
                     ])

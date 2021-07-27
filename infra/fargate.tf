@@ -25,20 +25,4 @@ module "fargate" {
   image_tag         = var.image_tag
   target_group_arn = module.fargate.target_group_arns[0]
   variable_file     = "auth.localenv"
-
-  create_listener_rule = true
-  listener_arn         = data.terraform_remote_state.gohunt_devops.outputs.ecs_alb_listener_arn
-  listener_rules = [
-    {
-      priority = 98
-      actions = [
-        {
-          type = "forward"
-        }
-      ],
-      conditions = [{
-        host_headers = ["test_nginx.staging.gohunt.com"]
-      }]
-    }
-  ]
 }
