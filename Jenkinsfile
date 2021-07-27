@@ -36,7 +36,12 @@ def Image_Tag_Append() {
 }
 
 def Tag() {
-    env.IMAGE_TAG = sh([returnStdout: true, label: 'save image_tag', script: "echo \${BUILD_ID}\${IMAGE_TAG_APPEND}"]).toString().trim()
+    if (env.TAG_NAME) {
+        env.IMAGE_TAG = env.TAG_NAME
+        sh "docker pull ${IMAGE_URI}:${IMAGE_TAG}"
+    } else {
+        env.IMAGE_TAG = sh([returnStdout: true, label: 'save image_tag', script: "echo \${BUILD_ID}\${IMAGE_TAG_APPEND}"]).toString().trim()
+    }
 }
 
 def TerraformScriptToRun() {
@@ -89,21 +94,7 @@ pipeline {
                     ])
                 }
             }
-            stage('Node Version') {
-                when {
-                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'feature' }
-                }
-                agent { label 'master' }
-                steps {
-                    ansiColor('xterm') {
-                        sh script: './terraform-modules/scripts/node_version.sh'
-                    }
-                }
-            }
             stage('ECR Login') {
-                when {
-                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'feature' }
-                }
                 agent { label 'master' }
                   steps {
                       script {
@@ -115,9 +106,6 @@ pipeline {
                   }
             }
             stage('Tag') {
-                when {
-                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'feature' }
-                }
                 agent { label 'master' }
                     steps {
                         script {
@@ -132,9 +120,20 @@ pipeline {
                         }
                     }
             }
+            stage('Node Version') {
+                when {
+                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'feature' && env.TAG_NAME == null }
+                }
+                agent { label 'master' }
+                steps {
+                    ansiColor('xterm') {
+                        sh script: './terraform-modules/scripts/node_version.sh'
+                    }
+                }
+            }
             stage('Update Tag') {
                 when {
-                    expression { GIT_BRANCH =~ 'release' }
+                    expression { GIT_BRANCH =~ 'release' && env.TAG_NAME == null }
                 }
                 agent { label 'master' }
                     steps {
@@ -161,7 +160,7 @@ pipeline {
             }
             stage('Create ECR Repo') {
                 when {
-                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'feature' }
+                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'feature' && env.TAG_NAME == null }
                 }
                 agent { label 'master' }
                   steps {
@@ -172,7 +171,7 @@ pipeline {
             }
             stage('Docker Build') {
                 when {
-                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'feature' }
+                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'feature' && env.TAG_NAME == null }
                 }
                 agent { label 'master' }
                   steps {
@@ -183,7 +182,7 @@ pipeline {
             }
             stage('Tag Git') {
                 when {
-                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'release' }
+                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'release' && env.TAG_NAME == null }
                 }
                 agent { label 'master' }
                   steps {
