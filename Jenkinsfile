@@ -81,9 +81,6 @@ pipeline {
             stage('SCM Checkout Secondary') {
                 agent { label 'gohunt-manual-jenkins-slave' }
                 steps {
-                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/${env.GIT_BRANCH}"]],
-                    userRemoteConfigs: [[credentialsId: '8a03683d-1f49-4493-84ee-a3f6f0fd76f1', url: 'git@bitbucket.org:gohuntcom/devops-pipeline.git']]
-                    ])
                     checkout([$class: 'GitSCM', branches: [[name: "refs/heads/${env.ENVIRONMENT}"]],
                     userRemoteConfigs: [[credentialsId: '8a03683d-1f49-4493-84ee-a3f6f0fd76f1', url: 'git@bitbucket.org:gohuntcom/aws-deployment-configurations.git']],
                     extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'manifest']]
