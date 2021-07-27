@@ -52,11 +52,6 @@ def TerraformScriptToRun() {
         env.TF_COMMAND = "plan"
 }
 
-def UpdateTag() {
-    env.STAGING_TAG = sh([returnStdout: true, label: 'save staging_tag', script: "cat ./manifest_staging/variables.tfvars | grep \${DOCKER_APP}_Version | awk -F '=' '{print \$2}' | tr -d '\"'"]).toString().trim()
-    env.IMAGE_TAG = sh([returnStdout: true, label: 'save updated_image_tag', script: "echo \${STAGING_TAG} | awk -F '-RC' '{print \$1}'"]).toString().trim()
-}
-
 pipeline {
     agent { label 'master' }
         stages {
@@ -142,12 +137,14 @@ pipeline {
                             Docker_App()
                             Aws_Account_Id()
                             IMAGE_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${DOCKER_APP}"
-                            UpdateTag()
                         }
                         ansiColor('xterm') {
                             sh """
-                              MANIFEST=\$(aws ecr batch-get-image --repository-name --region \${REGION} \${AWS_ACCOUNT_ID}.dkr.ecr.\${REGION}.amazonaws.com/\${DOCKER_APP} --image-ids imageTag=\${STAGING_TAG} --query 'images[].imageManifest' --output text)
-                              aws ecr put-image --repository-name \${AWS_ACCOUNT_ID}.dkr.ecr.\${REGION}.amazonaws.com/\${DOCKER_APP} --image-tag \${IMAGE_TAG} --image-manifest \$MANIFEST
+                              dockerapplabel=\$(echo \${DOCKER_APP} | tr '-' '_')
+                              STAGING_TAG=\$(cat ./manifest_staging/variables.tfvars | grep \${dockerapplabel}_Version | awk -F '=' '{print \$2}' | tr -d '\"')
+                              IMAGE_TAG=\$(echo \${STAGING_TAG} | awk -F '-RC' '{print \$1}')
+                              aws ecr batch-get-image --repository-name \${DOCKER_APP} --image-ids imageTag=\${STAGING_TAG} --region \${REGION} | jq -r '.images[].imageManifest' > manifest.json
+                              aws ecr put-image --repository-name \${DOCKER_APP} --region \${REGION} --image-tag \${IMAGE_TAG} --image-manifest file://manifest.json
                               echo Deploying \${IMAGE_TAG} to \${ENVIRONMENT}
                               REPO=\$(echo \${GIT_URL} | awk -F '/' '{print \$5 }')
                               git remote set-url origin git@bitbucket.org:gohuntcom/\$REPO
