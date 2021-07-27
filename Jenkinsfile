@@ -1,5 +1,5 @@
 def Docker_App() {
-    env.DOCKER_APP = 'gh-devops-nginx'
+    env.DOCKER_APP = 'DO-nginx'
 }
 
 def Environment() {
