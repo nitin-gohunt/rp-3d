@@ -53,7 +53,7 @@ def TerraformScriptToRun() {
 }
 
 def UpdateTag() {
-    env.staging_tag = sh([returnStdout: true, label: 'save staging_tag', script: "cat ./manifest_staging/variables.tfvars | grep \${DOCKER_APP}_Version | awk -F '=' '{print $2}' | tr -d '\"')"]).toString().trim()
+    env.staging_tag = sh([returnStdout: true, label: 'save staging_tag', script: "cat ./manifest_staging/variables.tfvars | grep \${DOCKER_APP}_Version | awk -F '=' '{print \$2}' | tr -d '\"')"]).toString().trim()
     env.IMAGE_TAG = sh([returnStdout: true, label: 'save updated_image_tag', script: "echo \${staging_tag} | awk -F '-RC' '{print \$1}'"]).toString().trim()
 }
 
