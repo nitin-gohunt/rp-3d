@@ -146,6 +146,8 @@ pipeline {
                         }
                         ansiColor('xterm') {
                             sh """
+                              MANIFEST=\$(aws ecr batch-get-image --repository-name \${AWS_ACCOUNT_ID}.dkr.ecr.\${REGION}.amazonaws.com/\${DOCKER_APP} --image-ids imageTag=\${staging_tag} --query 'images[].imageManifest' --output text)
+                              aws ecr put-image --repository-name \${AWS_ACCOUNT_ID}.dkr.ecr.\${REGION}.amazonaws.com/\${DOCKER_APP} --image-tag \${IMAGE_TAG} --image-manifest \$MANIFEST
                               echo Deploying \${IMAGE_TAG} to \${ENVIRONMENT}
                               REPO=\$(echo \${GIT_URL} | awk -F '/' '{print \$5 }')
                               git remote set-url origin git@bitbucket.org:gohuntcom/\$REPO
