@@ -45,7 +45,7 @@ def Tag() {
 }
 
 def TerraformScriptToRun() {
-    if (env.GIT_BRANCH =~ 'release' || env.GIT_BRANCH == 'experimental' || env.GIT_BRANCH == 'staging') {
+    if (env.TAG_NAME != null || env.GIT_BRANCH =~ 'release' || env.GIT_BRANCH == 'experimental' || env.GIT_BRANCH == 'staging') {
         env.TF_COMMAND = "apply"
     }
     else
@@ -196,7 +196,7 @@ pipeline {
             }
             stage('Terraform Deploy') {
                 when {
-                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'release' || GIT_BRANCH =~ 'feature' }
+                    expression { GIT_BRANCH != 'development' }
                 }
                 agent { label 'gohunt-manual-jenkins-slave' }
                 steps {
@@ -216,7 +216,7 @@ pipeline {
             }
             stage('Update Manifest') {
                 when {
-                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'release' }
+                    expression { env.TAG_NAME != null || GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'release' }
                 }
                 agent {
                     node { label 'master' }
