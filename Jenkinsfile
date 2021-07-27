@@ -178,7 +178,7 @@ pipeline {
             }
             stage('Tag Git') {
                 when {
-                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' || GIT_BRANCH =~ 'release' && env.TAG_NAME == null }
+                    expression { GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging' && env.TAG_NAME == null }
                 }
                 agent { label 'master' }
                   steps {
