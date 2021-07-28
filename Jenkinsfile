@@ -3,7 +3,7 @@ def Docker_App() {
 }
 
 def Environment() {
-    if (env.TAG_NAME !=~ "-RC" && env.GIT_BRANCH =~ 'release') {
+    if (env.TAG_NAME != "-RC" && env.GIT_BRANCH =~ 'release') {
         env.ENVIRONMENT = 'production'
         env.STACK_NAME = 'prod-green'
     }
