@@ -53,7 +53,7 @@ def Update_Tag() {
     env.IMAGE_TAG = sh([returnStdout: true, label: 'save updated_image_tag', script: "echo \${STAGING_TAG} | awk -F '-RC' '{print \$1}'"]).toString().trim()
 }
 
-def TerraformScriptToRun() {
+def Tf_Command_To_Run() {
     if (env.TAG_NAME != null || env.GIT_BRANCH =~ 'release' || env.GIT_BRANCH == 'experimental' || env.GIT_BRANCH == 'staging') {
         env.TF_COMMAND = "apply"
     }
@@ -208,7 +208,7 @@ pipeline {
                 agent { label 'gohunt-manual-jenkins-slave' }
                 steps {
                     script {
-                        TerraformScriptToRun()
+                        Tf_Command_To_Run()
                     }
                     ansiColor('xterm') {
                             writeFile(file: 'infra/variables.tfvars', text: "stack_name=\"${STACK_NAME}\" \ndocker_repo=\"${IMAGE_URI}\" \nenvironment=\"${ENVIRONMENT}\" \ndocker_app=\"${DOCKER_APP}\" \nremote_state_s3_bucket=\"gohunt-production-account-tf-states\" \nregion=\"us-west-2\" \nimage_tag=\"${IMAGE_TAG}\" \n")
