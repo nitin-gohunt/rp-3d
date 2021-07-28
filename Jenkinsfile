@@ -35,6 +35,10 @@ def Image_Tag_Append() {
         env.IMAGE_TAG_APPEND = "-Snapshot"
 }
 
+def Docker_App_Label() {
+    env.DOCKER_APP_LABEL = sh([returnStdout: true, label: 'save docker_app_label', script: "\$(echo \${DOCKER_APP} | tr '-' '_')"]).toString().trim()
+}
+
 def Tag() {
     if (env.TAG_NAME) {
         env.IMAGE_TAG = env.TAG_NAME
@@ -42,6 +46,11 @@ def Tag() {
     } else {
         env.IMAGE_TAG = sh([returnStdout: true, label: 'save image_tag', script: "echo \${BUILD_ID}\${IMAGE_TAG_APPEND}"]).toString().trim()
     }
+}
+
+def UpdateTag() {
+    env.STAGING_TAG = sh([returnStdout: true, label: 'save staging_tag', script: "cat ./manifest_staging/variables.tfvars | grep \${DOCKER_APP_LABEL}_Version | awk -F '=' '{print \$2}' | tr -d '\"'"]).toString().trim()
+    env.IMAGE_TAG = sh([returnStdout: true, label: 'save updated_image_tag', script: "echo \${STAGING_TAG} | awk -F '-RC' '{print \$1}'"]).toString().trim()
 }
 
 def TerraformScriptToRun() {
@@ -140,12 +149,11 @@ pipeline {
                             Docker_App()
                             Aws_Account_Id()
                             IMAGE_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${DOCKER_APP}"
+                            Docker_App_Label()
+                            UpdateTag()
                         }
                         ansiColor('xterm') {
                             sh """
-                              dockerapplabel=\$(echo \${DOCKER_APP} | tr '-' '_')
-                              STAGING_TAG=\$(cat ./manifest_staging/variables.tfvars | grep \${dockerapplabel}_Version | awk -F '=' '{print \$2}' | tr -d '\"')
-                              IMAGE_TAG=\$(echo \${STAGING_TAG} | awk -F '-RC' '{print \$1}')
                               aws ecr batch-get-image --repository-name \${DOCKER_APP} --image-ids imageTag=\${STAGING_TAG} --region \${REGION} | jq -r '.images[].imageManifest' > manifest.json
                               aws ecr put-image --repository-name \${DOCKER_APP} --region \${REGION} --image-tag \${IMAGE_TAG} --image-manifest file://manifest.json
                               echo Deploying \${IMAGE_TAG} to \${ENVIRONMENT}
@@ -223,14 +231,16 @@ pipeline {
                 agent {
                     node { label 'master' }
                 }
+                script {
+                    Docker_App_Label()
+                }
                 steps {
                     script {
                         sh """
                         cd manifest
-                        dockerapplabel=\$(echo \${DOCKER_APP} | tr '-' '_')
-                        sed -i "s/\${dockerapplabel}_Version.*/\${dockerapplabel}_Version=\\\"\${IMAGE_TAG}\\\"/g" variables.tfvars
+                        sed -i "s/\${DOCKER_APP_LABEL}_Version.*/\${DOCKER_APP_LABEL}_Version=\\\"\${IMAGE_TAG}\\\"/g" variables.tfvars
                         git add .
-                        git commit -m \${dockerapplabel}_Version=\"\${IMAGE_TAG}\"
+                        git commit -m \${DOCKER_APP_LABEL}_Version=\"\${IMAGE_TAG}\"
                         git push git@bitbucket.org:gohuntcom/aws-deployment-configurations.git HEAD:refs/heads/\${ENVIRONMENT} -f
                         """
                     }
