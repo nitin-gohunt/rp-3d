@@ -36,7 +36,7 @@ def Image_Tag_Append() {
 }
 
 def Docker_App_Label() {
-    env.DOCKER_APP_LABEL = sh([returnStdout: true, label: 'save docker_app_label', script: "\$(echo \${DOCKER_APP} | tr '-' '_')"]).toString().trim()
+    env.DOCKER_APP_LABEL = sh([returnStdout: true, label: 'save docker_app_label', script: "echo \${DOCKER_APP} | tr '-' '_'"]).toString().trim()
 }
 
 def Tag() {
