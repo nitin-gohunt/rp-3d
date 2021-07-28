@@ -48,7 +48,7 @@ def Tag() {
     }
 }
 
-def UpdateTag() {
+def Update_Tag() {
     env.STAGING_TAG = sh([returnStdout: true, label: 'save staging_tag', script: "cat ./manifest_staging/variables.tfvars | grep \${DOCKER_APP_LABEL}_Version | awk -F '=' '{print \$2}' | tr -d '\"'"]).toString().trim()
     env.IMAGE_TAG = sh([returnStdout: true, label: 'save updated_image_tag', script: "echo \${STAGING_TAG} | awk -F '-RC' '{print \$1}'"]).toString().trim()
 }
@@ -150,7 +150,7 @@ pipeline {
                             Aws_Account_Id()
                             IMAGE_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${DOCKER_APP}"
                             Docker_App_Label()
-                            UpdateTag()
+                            Update_Tag()
                         }
                         ansiColor('xterm') {
                             sh """
