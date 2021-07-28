@@ -100,6 +100,9 @@ pipeline {
                   steps {
                       script {
                           Aws_Region()
+                          Docker_App()
+                          Aws_Account_Id()
+                          IMAGE_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${DOCKER_APP}"
                       }
                       ansiColor('xterm') {
                           sh script: './terraform-modules/scripts/ecr_login.sh'
@@ -113,9 +116,6 @@ pipeline {
                 agent { label 'master' }
                     steps {
                         script {
-                            Docker_App()
-                            Aws_Account_Id()
-                            IMAGE_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${DOCKER_APP}"
                             Image_Tag_Append()
                             Tag()
                         }
@@ -146,9 +146,6 @@ pipeline {
                         extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'manifest_staging']]
                         ])
                         script {
-                            Docker_App()
-                            Aws_Account_Id()
-                            IMAGE_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${DOCKER_APP}"
                             Docker_App_Label()
                             Update_Tag()
                         }
