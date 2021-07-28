@@ -231,11 +231,9 @@ pipeline {
                 agent {
                     node { label 'master' }
                 }
-                script {
-                    Docker_App_Label()
-                }
                 steps {
                     script {
+                        Docker_App_Label()
                         sh """
                         cd manifest
                         sed -i "s/\${DOCKER_APP_LABEL}_Version.*/\${DOCKER_APP_LABEL}_Version=\\\"\${IMAGE_TAG}\\\"/g" variables.tfvars
