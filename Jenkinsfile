@@ -1,5 +1,5 @@
 def Docker_App() {
-    env.DOCKER_APP = 'dops-nginx'
+    env.DOCKER_APP = 'reverse-proxy-template'
 }
 
 def Environment() {
