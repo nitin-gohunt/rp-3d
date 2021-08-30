@@ -21,6 +21,11 @@ module "fargate" {
   vpc_id                    = data.terraform_remote_state.gohunt_devops.outputs.vpc_id
 
   # Service parameters
+  ulimit = [{
+    Name = "nofile"
+    HardLimit = 262144
+    SoftLimit = 262144
+  }]
   health_check_path = "/"
   image_tag         = var.image_tag
   variable_file     = "auth.localenv"
