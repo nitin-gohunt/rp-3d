@@ -1,0 +1,13 @@
+# the default configuration includes a HealthCheck endpoint, independent
+# from everything else, which AWS is able to evaluate against in order
+# to ensure the stability of the container.
+server {
+  listen 81;
+
+  allow all;
+
+  location /healthcheck {
+    stub_status;
+    server_tokens on;
+  }
+}
