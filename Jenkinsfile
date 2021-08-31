@@ -1,16 +1,16 @@
 def Docker_App() {
-    env.DOCKER_APP = 'reverse-proxy-template'
+    env.DOCKER_APP = 'reverse-proxy-gohunt'
 }
 
 def Environment() {
     if (env.TAG_NAME) {
-        if (!env.TAG_NAME.contains("-RC")) {
-            env.ENVIRONMENT = 'production'
-            env.STACK_NAME = 'prod-green'
-        }
-        else {
+        if (env.TAG_NAME =~ "-RC" || env.TAG_NAME =~ "-Snapshot") {
             env.ENVIRONMENT = 'staging'
             env.STACK_NAME = 'staging-green'
+        }
+        else {
+            env.ENVIRONMENT = 'production'
+            env.STACK_NAME = 'prod-green'
         }
     }
     else {
@@ -73,6 +73,12 @@ def Tf_Command_To_Run() {
         env.TF_COMMAND = "plan"
 }
 
+def Docker_Push() {
+    if (GIT_BRANCH == 'experimental' || GIT_BRANCH =~ 'staging') {
+        env.DOCKER_PUSH = "push"
+    }
+}
+
 pipeline {
     agent { label 'master' }
         stages {
@@ -84,7 +90,7 @@ pipeline {
                         properties([disableConcurrentBuilds(),
                                     buildDiscarder(logRotator(daysToKeepStr: '10'))])
                     }
-                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/test"]],
+                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/main"]],
                     userRemoteConfigs: [[credentialsId: '8a03683d-1f49-4493-84ee-a3f6f0fd76f1', url: 'git@bitbucket.org:gohuntcom/terraform-modules.git']],
                     extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'terraform-modules']]
                     ])
@@ -101,7 +107,7 @@ pipeline {
                     userRemoteConfigs: [[credentialsId: '8a03683d-1f49-4493-84ee-a3f6f0fd76f1', url: 'git@bitbucket.org:gohuntcom/aws-deployment-configurations.git']],
                     extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'manifest']]
                     ])
-                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/test"]],
+                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/main"]],
                     userRemoteConfigs: [[credentialsId: '8a03683d-1f49-4493-84ee-a3f6f0fd76f1', url: 'git@bitbucket.org:gohuntcom/terraform-modules.git']],
                     extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'terraform-modules']]
                     ])
@@ -160,11 +166,13 @@ pipeline {
                         }
                         ansiColor('xterm') {
                             sh """
+                              eval `ssh-agent`
+                              ssh-add /var/lib/jenkins/.ssh/id_rsa
                               aws ecr batch-get-image --repository-name \${DOCKER_APP} --image-ids imageTag=\${STAGING_TAG} --region \${REGION} | jq -r '.images[].imageManifest' > manifest.json
                               aws ecr put-image --repository-name \${DOCKER_APP} --region \${REGION} --image-tag \${IMAGE_TAG} --image-manifest file://manifest.json
                               echo Deploying \${IMAGE_TAG} to \${ENVIRONMENT}
                               REPO=\$(echo \${GIT_URL} | awk -F '/' '{print \$5 }')
-                              git remote set-url origin git@bitbucket.org:gohuntcom/\$REPO
+                              git remote set-url origin git@github.com:goHUNT-com/\$REPO
                               git tag --force \${IMAGE_TAG}
                               git push origin \${IMAGE_TAG}
                             """
@@ -188,8 +196,11 @@ pipeline {
                 }
                 agent { label 'master' }
                   steps {
+                      script {
+                            Docker_Push()
+                      }
                       ansiColor('xterm') {
-                          sh script: './terraform-modules/scripts/docker.sh $(pwd)'
+                          sh script: './terraform-modules/scripts/docker.sh $(pwd) ${DOCKER_PUSH}'
                       }
                   }
             }
@@ -200,10 +211,11 @@ pipeline {
                 agent { label 'master' }
                   steps {
                       ansiColor('xterm') {
-                          sh script: './terraform-modules/scripts/docker.sh $(pwd)'
                           sh """
+                              eval `ssh-agent`
+                              ssh-add /var/lib/jenkins/.ssh/id_rsa
                               REPO=\$(echo \${GIT_URL} | awk -F '/' '{print \$5 }')
-                              git remote set-url origin git@bitbucket.org:gohuntcom/\$REPO
+                              git remote set-url origin git@github.com:goHUNT-com/\$REPO
                               git tag --force \${IMAGE_TAG}
                               git push origin \${IMAGE_TAG}
                           """
