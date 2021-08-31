@@ -21,7 +21,7 @@ module "fargate" {
   vpc_id                    = data.terraform_remote_state.gohunt_devops.outputs.vpc_id
 
   # Service parameters
-  ulimit = [{
+  ulimits = [{
     Name = "nofile"
     HardLimit = 262144
     SoftLimit = 262144
