@@ -1,5 +1,5 @@
 def Docker_App() {
-    env.DOCKER_APP = 'reverse-proxy-gohunt'
+    env.DOCKER_APP = 'rp-gohunt'
 }
 
 def Environment() {
