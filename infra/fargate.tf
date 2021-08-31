@@ -23,8 +23,8 @@ module "fargate" {
   # Service parameters
   ulimits = [{
     name = "nofile"
-    hardLimit = 262144
-    softLimit = 262144
+    hardLimit = "262144"
+    softLimit = "262144"
   }]
   health_check_path = "/"
   image_tag         = var.image_tag
