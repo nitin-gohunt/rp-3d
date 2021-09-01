@@ -22,11 +22,39 @@ module "fargate" {
 
   # Service parameters
   ulimits = [{
-    name = "nofile"
+    name      = "nofile"
     hardLimit = "262144"
     softLimit = "262144"
   }]
   health_check_path = "/"
   image_tag         = var.image_tag
   variable_file     = "auth.localenv"
+  datadog_secrets = [
+    {
+      valueFrom = data.terraform_remote_state.gohunt_devops.outputs.datadog_secret_arn
+      name      = "DD_API_KEY"
+    }
+  ]
+  log_subscription_filter = {
+    destination_arn = data.terraform_remote_state.gohunt_devops.outputs.datadog_forwarder_arn
+    filter_pattern  = ""
+  }
+
+  # Listener parameters
+  create_listener_rule = true
+  listener_arn         = data.terraform_remote_state.gohunt_devops.outputs.ecs_alb_listener_arn
+  listener_rules = [
+    {
+      priority = 10
+      actions = [
+        {
+          type = "forward"
+        }
+      ],
+      conditions = [{
+        path_patterns = ["/*"]
+      }]
+    },
+  ]
+  target_group_arn = module.fargate.target_group_arns[0]
 }
