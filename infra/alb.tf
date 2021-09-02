@@ -8,8 +8,8 @@ module "alb" {
   # LB parameters
   create_lb       = true
   internal        = false
-  name            = var.docker_app
-  scheme          = "public"
+  name            = "rp"
+  scheme          = "pub"
   security_groups = [module.alb.security_group_id]
   subnets         = data.terraform_remote_state.gohunt_devops.outputs.public_subnets
   type            = "ALB"
