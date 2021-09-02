@@ -41,7 +41,7 @@ module "fargate" {
   }
 
   # Target Group Parameers
-  create_tg = true
+  create_target_group = true
   target_groups = [
     {
       backend_protocol     = "HTTP"
