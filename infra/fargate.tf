@@ -51,6 +51,8 @@ module "fargate" {
       health_check = {
         enabled             = true
         interval            = 30
+        path                = "/"
+        port                = 80
         healthy_threshold   = 5
         unhealthy_threshold = 2
         timeout             = 5
