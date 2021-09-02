@@ -59,9 +59,10 @@ module "fargate" {
       }
     },
     {
-      backend_protocol = "HTTP"
-      backend_port     = 8080
-      target_type      = "ip"
+      backend_protocol     = "HTTP"
+      backend_port         = 8080
+      target_type          = "ip"
+      deregistration_delay = 30
       health_check = {
         enabled             = true
         interval            = 30
