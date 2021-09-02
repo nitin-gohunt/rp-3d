@@ -10,7 +10,7 @@ module "alb" {
   internal        = false
   name            = "reverse-proxy"
   scheme          = "public"
-  security_groups = [module.fargate.security_group_id]
+  security_groups = [module.alb.security_group_id]
   subnets         = data.terraform_remote_state.gohunt_devops.outputs.public_subnets
   type            = "ALB"
 
