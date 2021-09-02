@@ -1,5 +1,5 @@
 // Module is pulled down in Jenkinsfile to terraform-modules path, if running locally pull the terraform-modules repo and update the source path
-module "fargate" {
+module "alb" {
   source = "../terraform-modules/load-balancer"
 
   # Default parameters
