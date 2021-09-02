@@ -26,7 +26,7 @@ module "fargate" {
     hardLimit = "262144"
     softLimit = "262144"
   }]
-  health_check_path = "/"
+  health_check_path = "/healthcheck"
   image_tag         = var.image_tag
   variable_file     = "auth.localenv"
   datadog_secrets = [
