@@ -8,7 +8,7 @@ module "alb" {
   # LB parameters
   create_lb       = true
   internal        = false
-  name            = "reverse-proxy"
+  name            = var.docker_app
   scheme          = "public"
   security_groups = [module.alb.security_group_id]
   subnets         = data.terraform_remote_state.gohunt_devops.outputs.public_subnets
