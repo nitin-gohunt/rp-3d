@@ -42,7 +42,7 @@ module "fargate" {
 
   # Listener parameters
   create_listener_rule = true
-  listener_arn         = data.terraform_remote_state.gohunt_devops.outputs.ecs_alb_listener_arn
+  listener_arn         = module.alb.http_tcp_listener_arns[0]
   listener_rules = [
     {
       priority = 10
