@@ -35,6 +35,7 @@ module "alb" {
 
   # SG parameters
   create_sg                       = true
+  sg_description                  = "Reverse Proxy security group"
   create_ingress_with_cidr_blocks = true
   ingress_with_cidr_blocks = [
     {
