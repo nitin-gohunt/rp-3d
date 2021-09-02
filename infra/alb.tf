@@ -26,8 +26,9 @@ module "alb" {
       protocol = "HTTP"
     },
     {
-      port     = 8080
-      protocol = "HTTP"
+      port             = 8080
+      protocol         = "HTTP"
+      target_group_arn = module.fargate.target_group_arns[1]
     }
   ]
 
