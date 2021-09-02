@@ -16,7 +16,7 @@ module "alb" {
 
   # LB Listener parameters
   create_http_listener = true
-  http_listeners = [
+  http_tcp_listeners = [
     {
       port     = 80
       protocol = "HTTP"
