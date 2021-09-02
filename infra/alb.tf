@@ -36,6 +36,7 @@ module "alb" {
   # SG parameters
   create_sg                       = true
   sg_description                  = "Reverse Proxy security group"
+  vpc_id                          = data.terraform_remote_state.gohunt_devops.outputs.vpc_id
   create_ingress_with_cidr_blocks = true
   ingress_with_cidr_blocks = [
     {
