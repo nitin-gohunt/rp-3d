@@ -1,6 +1,8 @@
 module "efs" {
   source = "../terraform-modules/efs"
 
+  stack_name = var.stack_name
+
   efs_name          = var.docker_app
   efs_subnets       = data.terraform_remote_state.gohunt_devops.outputs.private_subnets
   kms_key_id        = "arn:aws:kms:us-west-2:961267742133:key/c27ac6a3-c9e1-44d4-8145-fb7beda9398a"
