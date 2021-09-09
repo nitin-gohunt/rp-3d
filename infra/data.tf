@@ -11,7 +11,7 @@ data "terraform_remote_state" "gohunt_devops" {
 
   config = {
     bucket = local.tf_states_bucket
-    key    = "staging-green/tf-infrastructure.state"
+    key    = "${var.stack_name}/tf-infrastructure.state"
     region = var.region
   }
 }

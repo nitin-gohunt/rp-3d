@@ -18,16 +18,14 @@ module "alb" {
   create_http_listener = true
   http_tcp_listeners = [
     {
-      port     = 80
-      protocol = "HTTP"
-    },
-    {
-      port     = 81
-      protocol = "HTTP"
-    },
-    {
-      port     = 8080
-      protocol = "HTTP"
+      port        = 80
+      protocol    = "HTTP"
+      action_type = "redirect"
+      redirect = {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
     }
   ]
 
@@ -37,27 +35,7 @@ module "alb" {
       port            = 443
       protocol        = "HTTPS"
       certificate_arn = data.terraform_remote_state.gohunt_devops.outputs.ssl_arn
-    },
-    {
-      port            = 6443
-      protocol        = "HTTPS"
-      certificate_arn = data.terraform_remote_state.gohunt_devops.outputs.ssl_arn
-    },
-    {
-      port            = 7443
-      protocol        = "HTTPS"
-      certificate_arn = data.terraform_remote_state.gohunt_devops.outputs.ssl_arn
-    },
-    {
-      port            = 8443
-      protocol        = "HTTPS"
-      certificate_arn = data.terraform_remote_state.gohunt_devops.outputs.ssl_arn
-    },
-    {
-      port            = 10443
-      protocol        = "HTTPS"
-      certificate_arn = data.terraform_remote_state.gohunt_devops.outputs.ssl_arn
-    },
+    }
   ]
   target_group_arn = module.fargate.target_group_arns[0]
 
@@ -76,61 +54,13 @@ module "alb" {
       description = "http from public"
     },
     {
-      rule        = "off-brand http from public"
-      cidr_blocks = "0.0.0.0/0"
-      from_port   = 81
-      to_port     = 81
-      protocol    = "tcp"
-      description = "http from public"
-    },
-    {
-      rule        = "off-off-brand http from public"
-      cidr_blocks = "0.0.0.0/0"
-      from_port   = 8080
-      to_port     = 8080
-      protocol    = "tcp"
-      description = "http from public"
-    },
-    {
       rule        = "https from public"
       cidr_blocks = "0.0.0.0/0"
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
       description = "https from public"
-    },
-    {
-      rule        = "arcgis portal https from public"
-      cidr_blocks = "0.0.0.0/0"
-      from_port   = 6443
-      to_port     = 6443
-      protocol    = "tcp"
-      description = "https from public"
-    },
-    {
-      rule        = "arcgis server https from public"
-      cidr_blocks = "0.0.0.0/0"
-      from_port   = 7443
-      to_port     = 7443
-      protocol    = "tcp"
-      description = "https from public"
-    },
-    {
-      rule        = "arcgis server 2 https from public"
-      cidr_blocks = "0.0.0.0/0"
-      from_port   = 8443
-      to_port     = 8443
-      protocol    = "tcp"
-      description = "https from public"
-    },
-    {
-      rule        = "arcgis server 3 https from public"
-      cidr_blocks = "0.0.0.0/0"
-      from_port   = 10443
-      to_port     = 10443
-      protocol    = "tcp"
-      description = "https from public"
-    },
+    }
   ]
   create_egress_with_cidr_blocks = true
   egress_with_cidr_blocks = [
