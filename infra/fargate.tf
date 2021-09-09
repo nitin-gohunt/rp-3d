@@ -57,7 +57,7 @@ module "fargate" {
 
   # Listener parameters
   create_listener_rule = true
-  listener_arn         = module.alb.http_tcp_listener_arns[0]
+  listener_arn         = module.alb.https_listener_arns[0]
   listener_rules = [
     {
       priority = 10
