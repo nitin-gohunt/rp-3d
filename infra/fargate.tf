@@ -55,45 +55,6 @@ module "fargate" {
     filter_pattern  = ""
   }
 
-  # Target Group Parameers
-  create_target_group = true
-  target_groups = [
-    {
-      backend_protocol     = "HTTP"
-      backend_port         = 80
-      target_type          = "ip"
-      deregistration_delay = 30
-      health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/"
-        port                = 80
-        healthy_threshold   = 5
-        unhealthy_threshold = 2
-        timeout             = 5
-        protocol            = "HTTP"
-        matcher             = "200,301"
-      }
-    },
-    {
-      backend_protocol     = "HTTP"
-      backend_port         = 8080
-      target_type          = "ip"
-      deregistration_delay = 30
-      health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/"
-        port                = 8080
-        healthy_threshold   = 5
-        unhealthy_threshold = 2
-        timeout             = 5
-        protocol            = "HTTP"
-        matcher             = "200,301"
-      }
-    },
-  ]
-
   # Listener parameters
   create_listener_rule = true
   listener_arn         = module.alb.http_tcp_listener_arns[0]
