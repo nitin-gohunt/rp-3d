@@ -1,3 +1,3 @@
 output "https_listener_arn" {
-  value = module.alb.https_listener_arn[0]
+  value = module.alb.https_listener_arns[0]
 }
