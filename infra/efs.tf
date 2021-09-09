@@ -9,12 +9,12 @@ module "efs" {
 
 module "sg" {
   source = "../terraform-modules/security-group"
-  
+
   stack_name = var.stack_name
 
-  name        = "${var.docker_app}-efs"
   create_sg   = true
   description = "${var.docker_app}-efs-sg"
+  sg_name     = "${var.docker_app}-efs"
   vpc_id      = data.terraform_remote_state.gohunt_devops.outputs.vpc_id
 
   create_ingress_with_cidr_blocks = true
