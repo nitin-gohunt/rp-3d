@@ -29,6 +29,21 @@ module "fargate" {
   health_check_path = "/healthcheck"
   image_tag         = var.image_tag
   variable_file     = "auth.localenv"
+  volumes = [
+    {
+      name = "${var.docker_app}-efs"
+      efs_volume_configuration = {
+        file_system_id = module.efs.efs_file_system_id
+        root_directory = "/"
+      }
+    }
+  ]
+  mount_points = [
+    {
+      containerPath = "/data/nginx/cache"
+      sourceVolume  = "${var.docker_app}-efs"
+    }
+  ]
   datadog_secrets = [
     {
       valueFrom = data.terraform_remote_state.gohunt_devops.outputs.datadog_secret_arn
@@ -91,9 +106,9 @@ module "fargate" {
         }
       ],
       conditions = [{
-        path_patterns = ["/*"]
+        path_patterns = ["/arcgis/rest/services/Hosted/"]
       }]
-    },
+    }
   ]
   target_group_arn = module.fargate.target_group_arns[0]
 }
