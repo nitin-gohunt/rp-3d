@@ -32,10 +32,10 @@ module "fargate" {
   volumes = [
     {
       name = "${var.docker_app}-efs"
-      efs_volume_configuration = {
+      efs_volume_configuration = [{
         file_system_id = module.efs.efs_file_system_id
         root_directory = "/"
-      }
+      }]
     }
   ]
   mount_points = [
