@@ -23,7 +23,7 @@ module "sg" {
   ingress_with_cidr_blocks = [
     {
       rule        = "efs from vpc cidr"
-      cidr_blocks = data.terraform_remote_state.gohunt_devops.outputs.vpc_id
+      cidr_blocks = data.terraform_remote_state.gohunt_devops.outputs.vpc_cidr
       from_port   = 2049
       to_port     = 2049
       protocol    = "udp"
@@ -31,7 +31,7 @@ module "sg" {
     },
     {
       rule        = "efs from vpc cidr"
-      cidr_blocks = data.terraform_remote_state.gohunt_devops.outputs.vpc_id
+      cidr_blocks = data.terraform_remote_state.gohunt_devops.outputs.vpc_cidr
       from_port   = 2049
       to_port     = 2049
       protocol    = "tcp"
