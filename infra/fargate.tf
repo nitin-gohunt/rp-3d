@@ -67,7 +67,7 @@ module "fargate" {
         }
       ],
       conditions = [{
-        path_patterns = ["/arcgis/rest/services/Hosted/*", "/arcgis"]
+        path_patterns = ["/arcgis/rest/services/Hosted/*", "/arcgis/sharing/rest/content/items/*", "/arcgis"]
       }]
     }
   ]
