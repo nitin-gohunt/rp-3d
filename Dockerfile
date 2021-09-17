@@ -12,6 +12,7 @@ EXPOSE 10443
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY conf.d/ /etc/nginx/conf.d/
+RUN rm /etc/nginx/conf.d/default.conf
 
 RUN mkdir -p /data/nginx/cache
 

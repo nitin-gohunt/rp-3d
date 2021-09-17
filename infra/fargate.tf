@@ -26,8 +26,8 @@ module "fargate" {
     hardLimit = "262144"
     softLimit = "262144"
   }]
-  cpu = 512
-  memory = 8192
+  cpu               = 512
+  memory            = 4096
   health_check_path = "/healthcheck"
   image_tag         = var.image_tag
   variable_file     = "auth.localenv"
@@ -59,17 +59,17 @@ module "fargate" {
 
   # Listener parameters
   create_listener_rule = true
-  listener_arn         = module.alb.https_listener_arns[0]
+  listener_arn         = data.terraform_remote_state.rp_layers.outputs.https_listener_arn
   listener_rules = [
     {
-      priority = 10
+      priority = 40
       actions = [
         {
           type = "forward"
         }
       ],
       conditions = [{
-        path_patterns = ["/arcgis/rest/services/Hosted/*", "/arcgis/rest/services/StateLocator/*", "/arcgis/rest/services/Utilities/*", "/arcgis/sharing/rest/portals/self/*", "/arcgis/sharing/rest/content/items/*", "/arcgis"]
+        path_patterns = ["/arcgis/sharing/rest/portals/self/*", "/arcgis/sharing/rest/content/items/*"]
       }]
     }
   ]
