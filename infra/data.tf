@@ -15,3 +15,13 @@ data "terraform_remote_state" "gohunt_devops" {
     region = var.region
   }
 }
+
+data "terraform_remote_state" "rp_layers" {
+  backend = "s3"
+
+  config = {
+    bucket = local.tf_states_bucket
+    key    = "${var.stack_name}/rp-layers.state"
+    region = var.region
+  }
+}
