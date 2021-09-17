@@ -26,8 +26,8 @@ module "fargate" {
     hardLimit = "262144"
     softLimit = "262144"
   }]
-  cpu               = 512
-  memory            = 4096
+  cpu               = 1024
+  memory            = 2048
   health_check_path = "/healthcheck"
   image_tag         = var.image_tag
   variable_file     = "auth.localenv"
