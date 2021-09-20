@@ -30,6 +30,7 @@ module "fargate" {
   memory            = 2048
   health_check_path = "/healthcheck"
   image_tag         = var.image_tag
+  use_datadog       = "true"
   variable_file     = "auth.localenv"
   volumes = [
     {
