@@ -63,14 +63,14 @@ module "fargate" {
   listener_arn         = data.terraform_remote_state.rp_layers.outputs.https_listener_arn
   listener_rules = [
     {
-      priority = 40
+      priority = 50
       actions = [
         {
           type = "forward"
         }
       ],
       conditions = [{
-        path_patterns = ["/arcgis/sharing/rest/portals/self*", "/arcgis/sharing/rest/content/items/*"]
+        path_patterns = ["/arcgis/rest/services/WorldElevation3D/*"]
       }]
     }
   ]

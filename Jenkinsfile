@@ -1,5 +1,5 @@
 def Docker_App() {
-    env.DOCKER_APP = 'rp-sharing'
+    env.DOCKER_APP = 'rp-3d'
 }
 
 def Environment() {
